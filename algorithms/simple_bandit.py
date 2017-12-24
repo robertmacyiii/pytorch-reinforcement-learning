@@ -1,14 +1,17 @@
-import numpy as np
+import torch
+from torch.distributions import Categorical
 
 def train(num_actions, env, n, epsilon):
     """
     'A simple bandit algorithm' from Sutton and Barto page 25.
     """
-    q = np.zeros(n_actions)
-    n = np.zeros(n_actions)
+    q = torch.zeros(n_actions)
+    n = torch.zeros(n_actions)
     for i in range(n):
-        p = np.array([1 - epsilon * ((num_actions + 1) / num_actions) if i == np.argmax(q) else epsilon / num_actions for i in range(num_actions)])
-        a = np.random.choice(a=range(num_actions), p=p)
+        
+        p = torch.Tensor([1 - epsilon * ((num_actions + 1) / num_actions) if i == np.argmax(q) else epsilon / num_actions for i in range(num_actions)])
+        m = Categorical(p)
+        a = m.sample()
         r = env.step(a)
         n[a] += 1
         q[a] += (1 / n[a]) * (r - q[a])
